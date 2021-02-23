@@ -1523,6 +1523,7 @@ int mch_get_user_name(char_u *s, int len)
  */
 int mch_get_uname(uid_t uid, char_u *s, int len)
 {
+#ifndef __EMSCRIPTEN__
 #if defined(HAVE_PWD_H) && defined(HAVE_GETPWUID)
   struct passwd *pw;
 
@@ -1531,6 +1532,7 @@ int mch_get_uname(uid_t uid, char_u *s, int len)
     vim_strncpy(s, (char_u *)pw->pw_name, len - 1);
     return OK;
   }
+#endif
 #endif
   sprintf((char *)s, "%d", (int)uid); /* assumes s is long enough */
   return FAIL;                        /* a number is not a name */

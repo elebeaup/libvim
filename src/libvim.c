@@ -10,6 +10,11 @@
  */
 
 #include "vim.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 
 buf_T *vimBufferLoad(char_u *ffname_arg, linenr_T lnum, int flags)
 {
@@ -35,7 +40,7 @@ int vimBufferCheckIfChanged(buf_T *buf)
   return buf_check_timestamp(buf, 0);
 }
 
-buf_T *vimBufferGetCurrent(void) { return curbuf; }
+EMSCRIPTEN_KEEPALIVE buf_T *vimBufferGetCurrent(void) { return curbuf; }
 
 buf_T *vimBufferGetById(int id) { return buflist_findnr(id); }
 
@@ -59,15 +64,15 @@ void vimBufferSetFileFormat(buf_T *buf, int fileformat) { return set_fileformat_
 int vimBufferGetReadOnly(buf_T *buf) { return buf->b_p_ro; }
 void vimBufferSetReadOnly(buf_T *buf, int readonly) { buf->b_p_ro = readonly; }
 
-char_u *vimBufferGetLine(buf_T *buf, linenr_T lnum)
+EMSCRIPTEN_KEEPALIVE char_u *vimBufferGetLine(buf_T *buf, linenr_T lnum)
 {
   char_u *result = ml_get_buf(buf, lnum, FALSE);
   return result;
 }
 
-size_t vimBufferGetLineCount(buf_T *buf) { return buf->b_ml.ml_line_count; }
+EMSCRIPTEN_KEEPALIVE size_t vimBufferGetLineCount(buf_T *buf) { return buf->b_ml.ml_line_count; }
 
-void vimBufferSetLines(buf_T *buf, linenr_T start, linenr_T end, char_u **lines, int count)
+EMSCRIPTEN_KEEPALIVE void vimBufferSetLines(buf_T *buf, linenr_T start, linenr_T end, char_u **lines, int count)
 {
   int originalLineCount = vimBufferGetLineCount(buf);
   if (end == -1)
@@ -124,7 +129,7 @@ void vimColorSchemeSetCompletionCallback(ColorSchemeCompletionCallback callback)
   colorSchemeCompletionCallback = callback;
 }
 
-void vimSetBufferUpdateCallback(BufferUpdateCallback f)
+EMSCRIPTEN_KEEPALIVE void vimSetBufferUpdateCallback(BufferUpdateCallback f)
 {
   bufferUpdateCallback = f;
 }
@@ -220,12 +225,12 @@ void vimCommandLineGetCompletions(char_u ***completions, int *count)
   expand_cmdline(ccline.xpc, ccline.cmdbuff, ccline.cmdpos, count, completions);
 }
 
-linenr_T vimCursorGetLine(void) { return curwin->w_cursor.lnum; };
-colnr_T vimCursorGetColumn(void) { return curwin->w_cursor.col; };
-pos_T vimCursorGetPosition(void) { return curwin->w_cursor; };
+EMSCRIPTEN_KEEPALIVE linenr_T vimCursorGetLine(void) { return curwin->w_cursor.lnum; };
+EMSCRIPTEN_KEEPALIVE colnr_T vimCursorGetColumn(void) { return curwin->w_cursor.col; };
+EMSCRIPTEN_KEEPALIVE pos_T vimCursorGetPosition(void) { return curwin->w_cursor; };
 colnr_T vimCursorGetDesiredColumn(void) { return curwin->w_curswant; };
 
-void vimCursorSetPosition(pos_T pos)
+EMSCRIPTEN_KEEPALIVE void vimCursorSetPosition(pos_T pos)
 {
   curwin->w_cursor.lnum = pos.lnum;
   curwin->w_cursor.col = pos.col;
@@ -235,7 +240,7 @@ void vimCursorSetPosition(pos_T pos)
   curs_columns(TRUE);
 }
 
-void vimSetCursorAddCallback(CursorAddCallback callback)
+EMSCRIPTEN_KEEPALIVE void vimSetCursorAddCallback(CursorAddCallback callback)
 {
   cursorAddCallback = callback;
 }
@@ -292,12 +297,12 @@ void vimInputCore(int should_replace_termcodes, char_u *input)
   curs_columns(TRUE);
 }
 
-void vimInput(char_u *input)
+EMSCRIPTEN_KEEPALIVE void vimInput(char_u *input)
 {
   vimInputCore(0 /*should_replace_termcodes*/, input);
 }
 
-void vimKey(char_u *key)
+EMSCRIPTEN_KEEPALIVE void vimKey(char_u *key)
 {
   vimInputCore(1 /*should_replace_termcodes*/, key);
 }
@@ -450,7 +455,7 @@ void vimSetStopSearchHighlightCallback(VoidCallback callback)
   stopSearchHighlightCallback = callback;
 }
 
-void vimExecute(char_u *cmd) { do_cmdline_cmd(cmd); }
+EMSCRIPTEN_KEEPALIVE void vimExecute(char_u *cmd) { do_cmdline_cmd(cmd); }
 
 void vimOptionSetTabSize(int tabSize)
 {
@@ -529,7 +534,7 @@ void vimSetToggleCommentsCallback(ToggleCommentsCallback callback)
   toggleCommentsCallback = callback;
 }
 
-int vimGetMode(void) { return get_real_state(); }
+EMSCRIPTEN_KEEPALIVE int vimGetMode(void) { return get_real_state(); }
 
 subMode_T vimGetSubMode(void) { return sm_get_current_sub_mode(); }
 
@@ -611,7 +616,7 @@ void vimSetYankCallback(YankCallback callback)
   yankCallback = callback;
 }
 
-void vimInit(int argc, char **argv)
+EMSCRIPTEN_KEEPALIVE void vimInit(int argc, char **argv)
 {
   mparm_T params;
   vim_memset(&params, 0, sizeof(params));

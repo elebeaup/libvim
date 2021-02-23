@@ -158,8 +158,10 @@
 #include <pwd.h>
 #endif
 
+#ifndef __EMSCRIPTEN__
 #if (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) || (defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)) || defined(HAVE_SYSCTL) || defined(HAVE_SYSCONF)
 #define HAVE_TOTAL_MEM
+#endif
 #endif
 
 #ifndef PROTO

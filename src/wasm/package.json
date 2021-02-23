@@ -1,0 +1,14 @@
+{
+  "name": "libvim",
+  "version": "8.10869.85",
+  "description": "Standalone vim library",
+  "license": "MIT",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^3.6.3",
+    "jasmine": "^3.6.4",
+    "jasmine-spec-reporter": "^6.0.0"
+  }
+}

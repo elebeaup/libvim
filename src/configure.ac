@@ -146,6 +146,13 @@ fi
 
 OS_EXTRA_SRC=""; OS_EXTRA_OBJ=""
 
+WASM=no
+AC_MSG_CHECKING(for wasm)
+if test `basename $CC` = "emcc"; then
+  WASM=yes
+fi
+AC_MSG_RESULT($WASM)
+
 dnl Check for BeOS, which needs an extra source file
 AC_MSG_CHECKING(for BeOS)
 case `uname` in
@@ -2550,7 +2557,9 @@ AC_TRY_COMPILE([
 olibs="$LIBS"
 AC_MSG_CHECKING(--with-tlib argument)
 AC_ARG_WITH(tlib, [  --with-tlib=library     terminal library to be used ],)
-if test -n "$with_tlib"; then
+if test "$WASM" = "yes"; then
+  echo "SKIP tlib check since Wasm port does not use it"
+elif test -n "$with_tlib"; then
   AC_MSG_RESULT($with_tlib)
   LIBS="$LIBS -l$with_tlib"
   AC_MSG_CHECKING(for linking with $with_tlib library)
@@ -2598,7 +2607,9 @@ main() {char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(0); }],
   fi
 fi
 
-if test "x$olibs" = "x$LIBS"; then
+if test "$WASM" = "yes"; then
+  echo "SKIP tlib check since Wasm port does not use it"
+elif test "x$olibs" = "x$LIBS"; then
   AC_MSG_CHECKING([for tgetent()])
   AC_TRY_LINK([],
       [char s[10000]; int res = tgetent(s, "thisterminaldoesnotexist");],

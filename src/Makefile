@@ -1753,6 +1753,13 @@ libvim.a: $(OBJ) libvim.c
 	$(CCC) version.c -o objects/version.o
 	$(AR) rcs libvim.a $(OBJ)
 
+libvim.js: wasm/library_vim.js libvim.a
+	# -s ENVIRONMENT=web
+	$(CC) -s ASSERTIONS=2 -s STACK_OVERFLOW_CHECK=2 -s SAFE_HEAP=1 -Wl,--whole-archive libvim.a -Wl,--no-whole-archive -o $@ \
+		--js-library wasm/library_vim.js -s MODULARIZE=1 -s STRICT=1 --no-entry \
+		-s EXTRA_EXPORTED_RUNTIME_METHODS=['VIM','cwrap','addFunction','getValue','setValue'] \
+		-s ALLOW_TABLE_GROWTH=1
+
 xxd/xxd$(EXEEXT): xxd/xxd.c
 	cd xxd; CC="$(CC)" CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
 		$(MAKE) -f Makefile
@@ -1991,6 +1998,11 @@ installlibvim: libvim.a $(DEST_BIN) $(DEST_LIB)
 	mkdir -p $(DEST_INCLUDE)/auto
 	$(INSTALL_PROG) auto/*.h $(DEST_INCLUDE)/auto
 	$(INSTALL_PROG) libvim.a $(DEST_LIB)
+
+installlibvim.js: libvim.js $(DEST_BIN) $(DEST_LIB)
+	mkdir -p $(DEST_INCLUDE)
+	$(INSTALL_PROG) libvim.js $(DEST_LIB)
+	$(INSTALL_PROG) libvim.wasm $(DEST_LIB)
 
 #
 # Avoid overwriting an existing executable, somebody might be running it and

@@ -2014,7 +2014,7 @@ tltoa(unsigned long i)
  * minimal tgoto() implementation.
  * no padding and we only parse for %i %d and %+char
  */
-static char *
+char *
 tgoto(char *cm, int x, int y)
 {
   static char buf[30];
